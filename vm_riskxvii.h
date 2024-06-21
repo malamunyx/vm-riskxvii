@@ -19,5 +19,6 @@ int32_t exec_SB(struct core *c, uint32_t inst, uint8_t f3);
 
 /* Errors */
 void err_inst_not_implemented(struct core *c, uint32_t inst);
+void err_uknown_retval(struct core *c, uint32_t inst);
 
 #endif

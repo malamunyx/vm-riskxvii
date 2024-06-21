@@ -46,10 +46,10 @@ int main(int argc, char **argv) {
         } else if (retval == INST_JUMP) {
             continue;
         } else if (retval == INST_FAIL) {
+            err_inst_not_implemented(&c, inst);
             break;
         } else {
-            fprintf(stderr, "Invalid instruction return code\n");
-            fprintf(stderr, "Instruction: %x\n", inst);
+            err_uknown_retval(&c, inst);
             break;
         }
     }
@@ -75,6 +75,12 @@ void err_inst_not_implemented(struct core *c, uint32_t inst) {
     reg_dump(c);
 }
 
+void err_uknown_retval(struct core *c, uint32_t inst) {
+    printf("Unknown Instruction Return Value: 0x%08x\n", inst);
+    pc_dump(c);
+    reg_dump(c);
+}
+
 /* Decode and Execute */
 int32_t exec(struct core *c, uint32_t inst) {
     uint8_t op = opcode(inst);
@@ -92,7 +98,6 @@ int32_t exec(struct core *c, uint32_t inst) {
                             //printf("sub:\n");
                             return exec_sub(c, inst);
                         default: 
-                            err_inst_not_implemented(c, inst);
                             return INST_FAIL;
                     }
                 case 0x1:
@@ -110,7 +115,6 @@ int32_t exec(struct core *c, uint32_t inst) {
                         case 0x20:
                             return exec_sra(c, inst);
                         default: 
-                            err_inst_not_implemented(c, inst);
                             return INST_FAIL;
                     }
                 case 0x6:
@@ -118,7 +122,6 @@ int32_t exec(struct core *c, uint32_t inst) {
                 case 0x7:
                     return exec_and(c, inst);
                 default:
-                    err_inst_not_implemented(c, inst);
                     return INST_FAIL;
             }
         case OP_I_AR: // Type I_Arithmetic : 0x13
@@ -136,7 +139,6 @@ int32_t exec(struct core *c, uint32_t inst) {
                 case 0x7:
                     return exec_andi(c, inst);
                 default:
-                    err_inst_not_implemented(c, inst);
                     return INST_FAIL;
             }
         case OP_I_MA: // Type I_MemAccess : 0x3
@@ -152,7 +154,6 @@ int32_t exec(struct core *c, uint32_t inst) {
                 case 0x5:
                     return exec_lhu(c, inst);
                 default:
-                    err_inst_not_implemented(c, inst);
                     return INST_FAIL;
             }
         case OP_I_PF: // Type I_ProgramFlow : 0x67
@@ -160,7 +161,6 @@ int32_t exec(struct core *c, uint32_t inst) {
                 case 0x0:
                     return exec_jalr(c, inst);
                 default:
-                    err_inst_not_implemented(c, inst);
                     return INST_FAIL;
             }
         case OP_S: // Type S : 0x23
@@ -172,7 +172,6 @@ int32_t exec(struct core *c, uint32_t inst) {
                 case 0x2:
                     return exec_sw(c, inst);
                 default:
-                    err_inst_not_implemented(c, inst);
                     return INST_FAIL;
             }
         case OP_SB: // Type SB : 0x63
@@ -190,7 +189,6 @@ int32_t exec(struct core *c, uint32_t inst) {
                 case 0x7:
                     return exec_bgeu(c, inst);
                 default:
-                    err_inst_not_implemented(c, inst);
                     return INST_FAIL;
             }
         case OP_U: // Type U : 0x37
@@ -198,7 +196,6 @@ int32_t exec(struct core *c, uint32_t inst) {
         case OP_UJ: // Type UJ : 0x6f
             return exec_jal(c, inst);
         default:
-            err_inst_not_implemented(c, inst);
             return INST_FAIL;
     }
 }
