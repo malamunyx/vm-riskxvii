@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
 
     struct core c = {
         .pc = 0,
-        .reg= {0}, 
+        .reg = {0}, 
         .mem = {0},
         .heap = {0},
         .start = hist_init()
@@ -28,6 +28,7 @@ int main(int argc, char **argv) {
     /* All .mi files are guaranteed 2048 bytes of memory */
     if (fread(c.mem, sizeof(int8_t), MEM_SIZE, f) != MEM_SIZE) {
         fprintf(stderr, "Error loading memory image\n");
+        list_free(c.start);
         exit(1);
     }
     
@@ -40,13 +41,16 @@ int main(int argc, char **argv) {
 
         int retval = exec(&c, inst);
         
-        if (retval == INST_FAIL) {
-            break;
+        if (retval == INST_SUCCESS) {
+            c.pc += INST_SIZE;
         } else if (retval == INST_JUMP) {
             continue;
+        } else if (retval == INST_FAIL) {
+            break;
         } else {
-            // INST_SUCCESS
-            c.pc += INST_SIZE;
+            fprintf(stderr, "Invalid instruction return code\n");
+            fprintf(stderr, "Instruction: %x\n", inst);
+            break;
         }
     }
 

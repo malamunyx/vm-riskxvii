@@ -23,7 +23,6 @@ run:
 test:
 	echo "Add tests here!"
 
-
 clean:
 	rm -f *.o *.obj $(TARGET)
 
